@@ -1,5 +1,7 @@
 # nanosleep
 
+[![CI](https://github.com/Kronuz/nanosleep/actions/workflows/ci.yml/badge.svg)](https://github.com/Kronuz/nanosleep/actions/workflows/ci.yml)
+
 A small, header-only, dependency-free **EINTR-safe nanosleep** helper for C++20,
 extracted from [Xapiand](https://github.com/Kronuz/Xapiand).
 
