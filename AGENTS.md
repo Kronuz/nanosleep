@@ -20,14 +20,30 @@ Everything is header-only. There is no `.cc` to compile except the test. The
 CMake target is a pure `INTERFACE` library that only adds the source dir to the
 include path and requests `cxx_std_20`.
 
-## Build and run the test
+## Verification and benchmarks
+
+CI (`.github/workflows/ci.yml`) calls the catalog's shared
+[`cmake.yml`](https://github.com/Kronuz/cpp-libraries/blob/main/.github/workflows/cmake.yml) on every push and nightly:
+CTest on Linux (x86-64 GCC and Clang, arm64), macOS (arm64, x86-64) and FreeBSD, then again under
+ASan+UBSan and TSan. The shared method is the catalog's
+[PERFORMANCE.md](https://github.com/Kronuz/cpp-libraries/blob/main/docs/PERFORMANCE.md).
 
 ```sh
-cmake -B build && cmake --build build && ctest --test-dir build
+cmake -S . -B build && cmake --build build && ctest --test-dir build --output-on-failure
+# ASan+UBSan as CI's linux-asan-ubsan job runs it (Linux, Clang)
+CC=clang CXX=clang++ cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=Debug \
+  "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer -D_GLIBCXX_ASSERTIONS" \
+  "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+cmake --build build-asan && ASAN_OPTIONS=detect_leaks=1 ctest --test-dir build-asan --output-on-failure
 ```
 
-Expected output ends with `all nanosleep tests passed`, exit 0. The test target
-is `nanosleep_test`; the registered CTest name is `nanosleep`.
+The test target is `nanosleep_test`, registered in CTest as `nanosleep`; its output ends with
+`all nanosleep tests passed`, exit 0. It uses `assert`, which a Release build compiles out; the
+default (empty) build type keeps it. The reference is `std::chrono::steady_clock`: 0.1, 0.25 and
+0.5 ms sleeps must last at least their length less 20 us, and `nanosleep(0)` must return within
+1 ms. No test delivers a signal, so the `EINTR` retry loop rests on review of `nanosleep.h`, not
+on a test. There is no bench, fuzz target or mutation script: the library makes no performance
+claim.
 
 ## Conventions
 
