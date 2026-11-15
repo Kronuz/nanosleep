@@ -75,6 +75,8 @@ Not for:
 
 ## 📚 Documentation
 
+- [The Bag of Holding](https://kronuz.github.io/blog/bag-of-holding/):
+  the Familiars post that covers `nanosleep` among the small helpers.
 - [ARCHITECTURE.md](ARCHITECTURE.md): the retry loop and the two `nanosleep`s.
 - [AGENTS.md](AGENTS.md): repository map and traps.
 - [Kronuz C++ Libraries](https://github.com/Kronuz/cpp-libraries/blob/main/AGENTS.md#nanosleep): the catalog entry.
